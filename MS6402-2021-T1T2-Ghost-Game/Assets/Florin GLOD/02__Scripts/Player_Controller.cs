@@ -195,6 +195,13 @@ public class Player_Controller : MonoBehaviour
 
     private void MouseRotating()
     {
+        Vector3 lookPos = GameObject.FindGameObjectWithTag("MainCamera").transform.position - transform.position;
+        Quaternion lookRot = Quaternion.LookRotation(lookPos, Vector3.up);
+        float eulerY = lookRot.eulerAngles.y;
+        Quaternion Rrotation = Quaternion.Euler(0, eulerY - 180, 0);
+        transform.rotation = Rrotation;
+
+        return;//no need for the lines below
         if (infoBools.isMeleeATK) return;
 
         //if (__script_HP.curr_valor_HP <= 0) return;
@@ -210,6 +217,8 @@ public class Player_Controller : MonoBehaviour
         }
         //_______________________________________________________________________
         #endregion
+
+        
 
         #region Face Mouse direction when not moving or in range attack
         //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
