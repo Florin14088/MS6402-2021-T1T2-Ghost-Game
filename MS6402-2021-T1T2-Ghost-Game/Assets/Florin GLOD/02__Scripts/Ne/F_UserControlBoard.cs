@@ -2,67 +2,122 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class F_UserControlBoard : MonoBehaviour
 {
-    private F_CharacterController m_Character; // A reference to the ThirdPersonCharacter on the object
-    private Transform m_Cam;                  // A reference to the main camera in the scenes transform
-    private Vector3 m_CamForward;             // The current forward direction of the camera
-    private Vector3 m_Move;
-    private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
+    //in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you
+
+    #region PUBLIC VARIABLES
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    public KeyCode runKey = KeyCode.LeftShift;
+    [Space]
+    public float attackDuration = 2;
+    //_______________________________________________________________________
+    #endregion
 
 
-    private void Start()
-    {
-        // get the transform of the main camera
-        if (Camera.main != null)
-        {
-            m_Cam = Camera.main.transform;
-        }
-        else
-        {
-            Debug.LogWarning(
-                "Warning: no main camera found. Third person character needs a Camera tagged \"MainCamera\", for camera-relative controls.", gameObject);
-            // we use self-relative controls in this case, which probably isn't what the user wants, but hey, we warned them!
-        }
+    #region PRIVATE VARIABLES
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    private F_CharacterController __script_F_CharCont;//this script works in pair with this script
+    private Transform mainCamera;//you need ONLY ONE active camera with tag "MainCamera"
+    private Animator anim;
 
-        // get the third person character ( this should never be null due to require component )
-        m_Character = GetComponent<F_CharacterController>();
-    }
+    private Vector3 where_Cam_face_Forward;
+    private Vector3 movement;
 
+    private float cooldownDrop = 0.5f;//used in function Lifeline_Span()
+    private float nextCooldownDrop = 0;//used in function Lifeline_Span()
+    private float pouringContainer = 0;//used in function Lifeline_Span()
 
-    private void Update()
-    {
+    private float horizontal_Input;
+    private float vertical_Input;
+    //_______________________________________________________________________
+    #endregion
         
-    }
 
 
-    // Fixed update is called in sync with physics
-    private void FixedUpdate()
+    #region Start()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    void Start()
     {
-        // read inputs
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-        bool crouch = Input.GetKey(KeyCode.C);
+        mainCamera = Camera.main.transform;
+        __script_F_CharCont = GetComponent<F_CharacterController>();
+        anim = GetComponent<Animator>();
 
-        // calculate move direction to pass to character
-        if (m_Cam != null)
-        {
-            // calculate camera relative direction to move:
-            m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
-            m_Move = v * m_CamForward + h * m_Cam.right;
-        }
-        else
-        {
-            // we use world-relative directions in the case of no main camera
-            m_Move = v * Vector3.forward + h * Vector3.right;
-        }
-#if !MOBILE_INPUT
-        // walk speed multiplier
-        if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
-#endif
+    }//Start
+     //_______________________________________________________________________
+    #endregion
 
-        // pass all parameters to the character control script
-        m_Character.Move(m_Move, crouch, m_Jump);
-        m_Jump = false;
+
+    #region Update()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    void Update()
+    {
+        Lifeline_Span();
+
+        if (Input.GetKey(KeyCode.Mouse0) && pouringContainer == 0)
+        {
+            pouringContainer += attackDuration;
+            anim.SetInteger("Pain", 1);
+        }
     }
-}
+    //_______________________________________________________________________
+    #endregion
+
+
+    #region Fixed Update()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    void FixedUpdate()
+    {
+        horizontal_Input = Input.GetAxis("Horizontal");
+        vertical_Input = Input.GetAxis("Vertical");
+
+        
+        if (mainCamera != null)
+        {            
+            where_Cam_face_Forward = Vector3.Scale(mainCamera.forward, new Vector3(1, 0, 1)).normalized;
+            movement = vertical_Input * where_Cam_face_Forward + horizontal_Input * mainCamera.right;
+        }
+        else movement = vertical_Input * Vector3.forward + horizontal_Input * Vector3.right;
+
+
+        //unless Run key is pressed, move half speed
+        if (!Input.GetKey(runKey)) movement *= 0.5f;
+
+        
+        __script_F_CharCont.Behaviour_Movement(movement);
+
+    }//FixedUpdate
+     //_______________________________________________________________________
+    #endregion
+
+    #region My Functions
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    public void Lifeline_Span()//things like attacking that have long animations will add their duration here to prevent Idle animation taking over until the timer is 0 again
+    {
+        if (pouringContainer == 0) return;
+        if (pouringContainer < 0) pouringContainer = 0;
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D)) pouringContainer -= pouringContainer;
+
+        if (Time.time > nextCooldownDrop)
+        {
+            nextCooldownDrop = Time.time + cooldownDrop;
+            pouringContainer -= cooldownDrop;
+        }
+
+        if (pouringContainer <= 0)
+        {
+            anim.SetInteger("Pain", 0);
+            //infoBools.isMeleeATK = false;
+            //infoBools.isRangeATK = false;
+        }
+
+    }//Lifeline_Span
+     //_______________________________________________________________________
+    #endregion
+
+
+}//END
+
+//in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you

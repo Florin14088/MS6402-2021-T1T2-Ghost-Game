@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class F_AI_SimplePain : MonoBehaviour
 {
+    //in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you
+
     public GameObject target; //or other target
     public List<string> target_Tags;
     [Space]
@@ -178,6 +180,7 @@ public class F_AI_SimplePain : MonoBehaviour
 
 }//END
 
+//in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you
 
 #region 
 //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾

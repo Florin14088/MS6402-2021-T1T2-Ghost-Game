@@ -1,348 +1,173 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class F_CameraController : MonoBehaviour
 {
-    public float sensitivityX;
-    public float sensitivityY;
-    public GameObject pivot;
+    //in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you
+
+    #region PUBLIC VARIABLES
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    public float sens_X = 50;//sensitivity
+    public float sens_Y = 50;
+    public GameObject pivot;//do now put player here. Your camera should have a parent. Put that parent here so camera can orbit around it
     [Space]
     [Space]
-    public float clipMoveTime = 0.05f;              // time taken to move when avoiding cliping (low value = fast, which it should be)
-    public float returnTime = 0.4f;                 // time taken to move back towards desired position, when not clipping (typically should be a higher value than clipMoveTime)
-    public float sphereCastRadius = 0.1f;           // the radius of the sphere used to test for object between camera and target
-    public bool visualiseInEditor;                  // toggle for visualising the algorithm through lines for the raycast in the editor
-    public float closestDistance = 0.5f;            // the closest distance the camera can be from the target
-    public bool protecting { get; private set; }    // used for determining if there is an object between the target and the camera
-    public string dontClipTag = "Player";           // don't clip against objects with this tag (useful for not clipping against the targeted object)
+    public float delay_MoveClip = 0.05f;//This is clip avoidance time, the smaller the value, the faster it goes. 
+    public float delay_returnTime = 0.4f;//This is the time it takes to move back to original position. Have to be a bigger value than delay_MoveClip
+    public float radius_castCheck = 0.1f;//SphereCast for objects between target and camera
+    public float minDist = 0.5f;//min distance between target and camera
+    [Space]
+    [Space]
+    public Transform mainCamera;
+    public Transform cam_Pivot;//camera pivots around this
+    public float init_dist;//original camera distance. The script will change this
+    public bool b_protection {get; private set;}//check if an there is something between camera and player
+    public string tag_ignoreClip = "Player";//put here Player/target tag
+                                            //_______________________________________________________
+    #endregion
 
 
+    #region PRIVATE VARIABLES
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    private float mouse_H;//mouse horizontal
+    private float mouse_V;//mouse vertical
+    private float camSpeed;//camera speed
 
-    private float horizontalMouse;
-    private float verticalMouse;
-    [SerializeField] private Transform m_Cam;                  // the transform of the camera
-    [SerializeField] private Transform m_Pivot;                // the point at which the camera pivots around
-    [SerializeField] private float m_OriginalDist;             // the original distance to the camera before any modification are made
-    private float m_MoveVelocity;             // the velocity at which the camera moved
-    private float m_CurrentDist;              // the current distance from the camera to the target
-    private Ray m_Ray = new Ray();                        // the ray used in the lateupdate for casting between the camera and the target
-    private RaycastHit[] m_Hits;              // the hits between the camera and the target
-    private RayHitComparer m_RayHitComparer;  // variable to compare raycast hit distances
+    private float curr_camDist;//distance from camera to target/player
+    private float targetDist;
+
+    private bool b_initialIntersect = false;
+    private bool b_hitSomething = false;
+    private float nearest;
 
 
+    private Ray __ray__ = new Ray();//used in LateUpdate()
+    private RaycastHit[] __hits__;
+    private RayHitComparer ray_hit_Dist;
+    //_______________________________________________________________________
+    #endregion
 
 
+    
+
+
+    #region START()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = true;
 
-        // find the camera in the object hierarchy
-        //m_Cam = GetComponentInChildren<Camera>().transform;
-        //m_Pivot = m_Cam.parent;
-        m_OriginalDist = m_Cam.localPosition.magnitude;
-        m_CurrentDist = m_OriginalDist;
+        init_dist = mainCamera.localPosition.magnitude;
+        curr_camDist = init_dist;
 
-        // create a new RayHitComparer
-        m_RayHitComparer = new RayHitComparer();
+        ray_hit_Dist = new RayHitComparer();
 
-    }
+    }//Start
+     //_______________________________________________________________________
+    #endregion
 
 
-
-    private void Update()
+    #region UPDATE()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+    void Update()
     {
-        verticalMouse = Input.GetAxis("Mouse Y") * -sensitivityX;
-        horizontalMouse = Input.GetAxis("Mouse X") * sensitivityY;
+        mouse_V = Input.GetAxis("Mouse Y") * -sens_X;
+        mouse_H = Input.GetAxis("Mouse X") * sens_Y;
 
-        pivot.transform.eulerAngles += new Vector3(verticalMouse * Time.deltaTime, horizontalMouse * Time.deltaTime, 0);
-
+        pivot.transform.eulerAngles += new Vector3(mouse_V * Time.deltaTime, mouse_H * Time.deltaTime, 0);
 
     }//Update
+     //_______________________________________________________________________
+    #endregion
 
 
+    #region LATE UPDATE()
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
     private void LateUpdate()
     {
-        // initially set the target distance
-        float targetDist = m_OriginalDist;
+        targetDist = init_dist;
 
-        m_Ray.origin = m_Pivot.position + m_Pivot.forward * sphereCastRadius;
-        m_Ray.direction = -m_Pivot.forward;
+        __ray__.origin = cam_Pivot.position + cam_Pivot.forward * radius_castCheck;
+        __ray__.direction = -cam_Pivot.forward;
 
-        // initial check to see if start of spherecast intersects anything
-        var cols = Physics.OverlapSphere(m_Ray.origin, sphereCastRadius);
 
-        bool initialIntersect = false;
-        bool hitSomething = false;
+        //quick check
+        Collider[] allCollisions = Physics.OverlapSphere(__ray__.origin, radius_castCheck);
 
-        // loop through all the collisions to check if something we care about
-        for (int i = 0; i < cols.Length; i++)
+
+        b_initialIntersect = false;
+        b_hitSomething = false;
+
+
+        //check collisions
+        for (int i = 0; i < allCollisions.Length; i++)
         {
-            if ((!cols[i].isTrigger) &&
-                !(cols[i].attachedRigidbody != null && cols[i].attachedRigidbody.CompareTag(dontClipTag)))
+            if ((!allCollisions[i].isTrigger) && !(allCollisions[i].attachedRigidbody != null && allCollisions[i].attachedRigidbody.CompareTag(tag_ignoreClip)))
             {
-                initialIntersect = true;
+                b_initialIntersect = true;
                 break;
             }
         }
 
-        // if there is a collision
-        if (initialIntersect)
-        {
-            m_Ray.origin += m_Pivot.forward * sphereCastRadius;
 
-            // do a raycast and gather all the intersections
-            m_Hits = Physics.RaycastAll(m_Ray, m_OriginalDist - sphereCastRadius);
+        //if collision found
+        if (b_initialIntersect)
+        {
+            __ray__.origin += cam_Pivot.forward * radius_castCheck;            
+            __hits__ = Physics.RaycastAll(__ray__, init_dist - radius_castCheck);
         }
-        else
+        else __hits__ = Physics.SphereCastAll(__ray__, radius_castCheck, init_dist + radius_castCheck);
+
+
+        //collisions get sorted by distance
+        Array.Sort(__hits__, ray_hit_Dist);        
+        nearest = Mathf.Infinity;
+
+
+        // loop all collisions
+        for (int i = 0; i < __hits__.Length; i++)
         {
-            // if there was no collision do a sphere cast to see if there were any other collisions
-            m_Hits = Physics.SphereCastAll(m_Ray, sphereCastRadius, m_OriginalDist + sphereCastRadius);
-        }
-
-        // sort the collisions by distance
-        System.Array.Sort(m_Hits, m_RayHitComparer);
-
-        // set the variable used for storing the closest to be as far as possible
-        float nearest = Mathf.Infinity;
-
-        // loop through all the collisions
-        for (int i = 0; i < m_Hits.Length; i++)
-        {
-            // only deal with the collision if it was closer than the previous one, not a trigger, and not attached to a rigidbody tagged with the dontClipTag
-            if (m_Hits[i].distance < nearest && (!m_Hits[i].collider.isTrigger) &&
-                !(m_Hits[i].collider.attachedRigidbody != null &&
-                  m_Hits[i].collider.attachedRigidbody.CompareTag(dontClipTag)))
+            //manage collision i if it is closer than collision i-1. Also, no trigger and not the objects with the ignore tag
+            if (__hits__[i].distance < nearest && (!__hits__[i].collider.isTrigger) && !(__hits__[i].collider.attachedRigidbody != null && __hits__[i].collider.attachedRigidbody.CompareTag(tag_ignoreClip)))
             {
-                // change the nearest collision to latest
-                nearest = m_Hits[i].distance;
-                targetDist = -m_Pivot.InverseTransformPoint(m_Hits[i].point).z;
-                hitSomething = true;
+                //nearest collision is moved away in the order
+                nearest = __hits__[i].distance;
+                targetDist = -cam_Pivot.InverseTransformPoint(__hits__[i].point).z;
+                b_hitSomething = true;
             }
         }
 
-        // visualise the cam clip effect in the editor
-        if (hitSomething)
-        {
-            Debug.DrawRay(m_Ray.origin, -m_Pivot.forward * (targetDist + sphereCastRadius), Color.red);
-        }
 
-        // hit something so move the camera to a better position
-        protecting = hitSomething;
-        m_CurrentDist = Mathf.SmoothDamp(m_CurrentDist, targetDist, ref m_MoveVelocity,
-                                       m_CurrentDist > targetDist ? clipMoveTime : returnTime);
-        m_CurrentDist = Mathf.Clamp(m_CurrentDist, closestDistance, m_OriginalDist);
-        m_Cam.localPosition = -Vector3.forward * m_CurrentDist;
+        //camera needs to be moved and protected from obstacles
+        b_protection = b_hitSomething;
+        curr_camDist = Mathf.SmoothDamp(curr_camDist, targetDist, ref camSpeed, curr_camDist > targetDist ? delay_MoveClip : delay_returnTime);
+        curr_camDist = Mathf.Clamp(curr_camDist, minDist, init_dist);
+        mainCamera.localPosition = -Vector3.forward * curr_camDist;
 
     }//LateUpdate
+     //_______________________________________________________________________
+    #endregion
 
 
-    // comparer for check distances in ray cast hits
+    #region MY FUNCTIONS
+    //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
     public class RayHitComparer : IComparer
     {
         public int Compare(object x, object y)
         {
             return ((RaycastHit)x).distance.CompareTo(((RaycastHit)y).distance);
         }
-    }
+
+    }//RayHitComparer
+     //_______________________________________________________________________
+    #endregion
 
 
 
 }//END
 
-/*
- * 
- *          
- *          private RaycastHit hit_negUp = new RaycastHit();
-    private RaycastHit hit_Up = new RaycastHit();
-    private RaycastHit hit_negRight = new RaycastHit();
-    private RaycastHit hit_Right = new RaycastHit();
-    private RaycastHit hit_negForward = new RaycastHit();
-    private RaycastHit hit_Forward = new RaycastHit();
-    private RaycastHit hit_camToPlayer = new RaycastHit();
-    
-    [Space]
-    public float distance_to_Check;
-    [Space]
-    public float distance_negUp;
-    public float distance_Up;
-    public float distance_negRight;
-    public float distance_Right;
-    public float distance_negForward;
-    public float distance_Forward;
- *          
-        #region Raycast
-        Physics.Raycast(transform.position, -Vector3.up * distance_to_Check, out hit_negUp);
-        Physics.Raycast(transform.position, Vector3.up * distance_to_Check, out hit_Up);
 
-        Physics.Raycast(transform.position, -Vector3.right * distance_to_Check, out hit_negRight);
-        Physics.Raycast(transform.position, Vector3.right * distance_to_Check, out hit_Right);
-
-        Physics.Raycast(transform.position, -Vector3.forward * distance_to_Check, out hit_negForward);
-        Physics.Raycast(transform.position, Vector3.forward * distance_to_Check, out hit_Forward);
-
-
-        Debug.DrawRay(transform.position, -Vector3.up * distance_to_Check, Color.blue); //down
-        Debug.DrawRay(transform.position, Vector3.up * distance_to_Check, Color.blue);//up
-
-        Debug.DrawRay(transform.position, -Vector3.right * distance_to_Check, Color.blue);//left
-        Debug.DrawRay(transform.position, Vector3.right * distance_to_Check, Color.blue);//right
-
-        Debug.DrawRay(transform.position, -Vector3.forward * distance_to_Check, Color.blue);//back
-        Debug.DrawRay(transform.position, Vector3.forward * distance_to_Check, Color.blue);//forward
-
-
-        if (hit_negUp.collider) distance_negUp = hit_negUp.distance;
-        if (hit_Up.collider) distance_Up = hit_Up.distance;
-
-        if (hit_negRight.collider) distance_negRight = hit_negRight.distance;
-        if (hit_Right.collider) distance_Right = hit_Right.distance;
-        
-        if (hit_negForward.collider) distance_negForward = hit_negForward.distance;
-        if (hit_Forward.collider) distance_Forward = hit_Forward.distance;
-
-
-        if (distance_negUp <= distance_to_Check) //down
-        if (distance_Up <= distance_to_Check) ; 
-
-        if (distance_negRight <= distance_to_Check) ;
-        if (distance_Up <= distance_to_Check) ;
-
-        if (distance_negForward <= distance_to_Check) ;
-        if (distance_Up <= distance_to_Check) ;
-        #endregion
-*/
-
-
-/*
-      * 
-      * /*
-  *
-  * using System;
- using System.Collections;
- using UnityEngine;
-
- namespace UnityStandardAssets.Cameras
- {
-     public class ProtectCameraFromWallClip : MonoBehaviour
-     {
-         public float clipMoveTime = 0.05f;              // time taken to move when avoiding cliping (low value = fast, which it should be)
-         public float returnTime = 0.4f;                 // time taken to move back towards desired position, when not clipping (typically should be a higher value than clipMoveTime)
-         public float sphereCastRadius = 0.1f;           // the radius of the sphere used to test for object between camera and target
-         public bool visualiseInEditor;                  // toggle for visualising the algorithm through lines for the raycast in the editor
-         public float closestDistance = 0.5f;            // the closest distance the camera can be from the target
-         public bool protecting { get; private set; }    // used for determining if there is an object between the target and the camera
-         public string dontClipTag = "Player";           // don't clip against objects with this tag (useful for not clipping against the targeted object)
-
-         private Transform m_Cam;                  // the transform of the camera
-         private Transform m_Pivot;                // the point at which the camera pivots around
-         private float m_OriginalDist;             // the original distance to the camera before any modification are made
-         private float m_MoveVelocity;             // the velocity at which the camera moved
-         private float m_CurrentDist;              // the current distance from the camera to the target
-         private Ray m_Ray = new Ray();                        // the ray used in the lateupdate for casting between the camera and the target
-         private RaycastHit[] m_Hits;              // the hits between the camera and the target
-         private RayHitComparer m_RayHitComparer;  // variable to compare raycast hit distances
-
-
-         private void Start()
-         {
-             // find the camera in the object hierarchy
-             m_Cam = GetComponentInChildren<Camera>().transform;
-             m_Pivot = m_Cam.parent;
-             m_OriginalDist = m_Cam.localPosition.magnitude;
-             m_CurrentDist = m_OriginalDist;
-
-             // create a new RayHitComparer
-             m_RayHitComparer = new RayHitComparer();
-         }
-
-
-         private void LateUpdate()
-         {
-             // initially set the target distance
-             float targetDist = m_OriginalDist;
-
-             m_Ray.origin = m_Pivot.position + m_Pivot.forward*sphereCastRadius;
-             m_Ray.direction = -m_Pivot.forward;
-
-             // initial check to see if start of spherecast intersects anything
-             var cols = Physics.OverlapSphere(m_Ray.origin, sphereCastRadius);
-
-             bool initialIntersect = false;
-             bool hitSomething = false;
-
-             // loop through all the collisions to check if something we care about
-             for (int i = 0; i < cols.Length; i++)
-             {
-                 if ((!cols[i].isTrigger) &&
-                     !(cols[i].attachedRigidbody != null && cols[i].attachedRigidbody.CompareTag(dontClipTag)))
-                 {
-                     initialIntersect = true;
-                     break;
-                 }
-             }
-
-             // if there is a collision
-             if (initialIntersect)
-             {
-                 m_Ray.origin += m_Pivot.forward*sphereCastRadius;
-
-                 // do a raycast and gather all the intersections
-                 m_Hits = Physics.RaycastAll(m_Ray, m_OriginalDist - sphereCastRadius);
-             }
-             else
-             {
-                 // if there was no collision do a sphere cast to see if there were any other collisions
-                 m_Hits = Physics.SphereCastAll(m_Ray, sphereCastRadius, m_OriginalDist + sphereCastRadius);
-             }
-
-             // sort the collisions by distance
-             Array.Sort(m_Hits, m_RayHitComparer);
-
-             // set the variable used for storing the closest to be as far as possible
-             float nearest = Mathf.Infinity;
-
-             // loop through all the collisions
-             for (int i = 0; i < m_Hits.Length; i++)
-             {
-                 // only deal with the collision if it was closer than the previous one, not a trigger, and not attached to a rigidbody tagged with the dontClipTag
-                 if (m_Hits[i].distance < nearest && (!m_Hits[i].collider.isTrigger) &&
-                     !(m_Hits[i].collider.attachedRigidbody != null &&
-                       m_Hits[i].collider.attachedRigidbody.CompareTag(dontClipTag)))
-                 {
-                     // change the nearest collision to latest
-                     nearest = m_Hits[i].distance;
-                     targetDist = -m_Pivot.InverseTransformPoint(m_Hits[i].point).z;
-                     hitSomething = true;
-                 }
-             }
-
-             // visualise the cam clip effect in the editor
-             if (hitSomething)
-             {
-                 Debug.DrawRay(m_Ray.origin, -m_Pivot.forward*(targetDist + sphereCastRadius), Color.red);
-             }
-
-             // hit something so move the camera to a better position
-             protecting = hitSomething;
-             m_CurrentDist = Mathf.SmoothDamp(m_CurrentDist, targetDist, ref m_MoveVelocity,
-                                            m_CurrentDist > targetDist ? clipMoveTime : returnTime);
-             m_CurrentDist = Mathf.Clamp(m_CurrentDist, closestDistance, m_OriginalDist);
-             m_Cam.localPosition = -Vector3.forward*m_CurrentDist;
-         }
-
-
-         // comparer for check distances in ray cast hits
-         public class RayHitComparer : IComparer
-         {
-             public int Compare(object x, object y)
-             {
-                 return ((RaycastHit) x).distance.CompareTo(((RaycastHit) y).distance);
-             }
-         }
-     }
- }
-
-     */
-     
+//in doubts how to use this script? get in touch with me at https://www.instagram.com/florinpain_official/ and I can help you
