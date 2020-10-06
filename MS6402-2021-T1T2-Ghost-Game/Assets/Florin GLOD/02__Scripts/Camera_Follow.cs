@@ -39,7 +39,7 @@ public class Camera_Follow : MonoBehaviour
 
         //Smooth Damp
         Vector3 velocity = Vector3.zero;
-        transform.position = Vector3.SmoothDamp(transform.position, player.position + offset, ref velocity, 0.3f);
+        transform.position = Vector3.SmoothDamp(transform.position, player.position + offset, ref velocity, 0.06f);
         //print(velocity);
     }
 }

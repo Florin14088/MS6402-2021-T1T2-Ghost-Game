@@ -8,10 +8,6 @@ public class F_AI_SimplePain : MonoBehaviour
     public GameObject target; //or other target
     public List<string> target_Tags;
     [Space]
-    [Space]
-    public bool b_NPC_Coward = false;
-    [Space]
-    [Space]
     public float speed;
     public float rotSpeed;
     public bool b_canRun = true;
@@ -43,8 +39,6 @@ public class F_AI_SimplePain : MonoBehaviour
         anim = GetComponent<Animator>();
         obstacle = GetComponent<NavMeshObstacle>();
 
-        obstacle.enabled = false;
-        agent.enabled = true;
         agent.speed = speed;
         agent.angularSpeed = rotSpeed;
         obstacle.enabled = false;
@@ -78,17 +72,6 @@ public class F_AI_SimplePain : MonoBehaviour
 
     void AI_Brain()
     {
-        if (b_NPC_Coward == true)
-        {
-            if (Time.time > nextAttkMelee_Cooldown * 2)
-            {
-                agent.SetDestination(RandomNavmeshLocation(40));
-            }
-
-            return;//if the NPC is coward, the function will stop here
-
-        }
-
         #region Calculate distance between target and this object
         //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
         if (Time.time > next_CalcDist)
@@ -99,14 +82,14 @@ public class F_AI_SimplePain : MonoBehaviour
 
         if (currentDistance <= Attack_Distance)
         {
-            if(agent.enabled == true) agent.enabled = false;
-            if(obstacle.enabled == false) obstacle.enabled = true;
+            //if(agent.enabled == true) agent.enabled = false;
+            //if(obstacle.enabled == false) obstacle.enabled = true;
         }
 
         if (currentDistance > Attack_Distance)
         {
-            if (obstacle.enabled == true) obstacle.enabled = false;
-            if (agent.enabled == false) agent.enabled = true;
+            //if (obstacle.enabled == true) obstacle.enabled = false;
+            //if (agent.enabled == false) agent.enabled = true;
         }
         //_______________________________________________________
         #endregion
@@ -140,19 +123,21 @@ public class F_AI_SimplePain : MonoBehaviour
 
         #region Target within pursue distance && Not enough to attack
         //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-        if (currentDistance <= Pursue_Distance && currentDistance > Attack_Distance)
-        {
-            if (agent.pathStatus != NavMeshPathStatus.PathComplete)
-            {
-                if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
-                if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
-            }
+        Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out RaycastHit hit, Attack_Distance);
 
-            if (agent.pathStatus == NavMeshPathStatus.PathComplete)
-            {
-                if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
-                if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
-            }
+        if(hit.collider == null)
+        {
+            if (obstacle.enabled == true) obstacle.enabled = false;
+            if (agent.enabled == false) agent.enabled = true;
+            if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
+            if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
+        }
+        else
+        {
+            if (obstacle.enabled == true) obstacle.enabled = false;
+            if (agent.enabled == false) agent.enabled = true;
+            if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
+            //if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
 
         }
         //___________________________________________________________
@@ -189,20 +174,6 @@ public class F_AI_SimplePain : MonoBehaviour
         //if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
 
     }//AI_Idling
-
-
-    public Vector3 RandomNavmeshLocation(float radius)
-    {
-        Vector3 randomDirection = Random.insideUnitSphere * radius;
-        randomDirection += transform.position;
-        NavMeshHit hit;
-        Vector3 finalPosition = Vector3.zero;
-        if (NavMesh.SamplePosition(randomDirection, out hit, radius, 1))
-        {
-            finalPosition = hit.position;
-        }
-        return finalPosition;
-    }
 
 
 }//END
