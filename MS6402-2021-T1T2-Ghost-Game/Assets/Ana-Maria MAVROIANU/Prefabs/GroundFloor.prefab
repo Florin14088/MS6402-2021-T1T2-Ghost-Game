@@ -325,7 +325,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5499997, y: -0.4575, z: 0}
+  m_ConnectedAnchor: {x: 1.5499997, y: -0.45750004, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2094,7 +2094,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5500004, y: -0.4575, z: -0.00000045090925}
+  m_ConnectedAnchor: {x: 1.5500028, y: -0.45750004, z: -0.0000004299545}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -3406,7 +3406,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5500019, y: -0.4575, z: 0}
+  m_ConnectedAnchor: {x: 1.5499971, y: -0.45750004, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -7153,7 +7153,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5499965, y: -0.4575, z: 0.0000005960461}
+  m_ConnectedAnchor: {x: 1.5499965, y: -0.45750004, z: 0.0000005960461}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -7332,7 +7332,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.549998, y: -0.4575, z: -0.00000047186398}
+  m_ConnectedAnchor: {x: 1.549998, y: -0.45750004, z: -0.00000047186398}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -9492,7 +9492,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5499965, y: -0.4575, z: 0.0000017881383}
+  m_ConnectedAnchor: {x: 1.5499965, y: -0.45750004, z: 0.0000017881383}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -9638,7 +9638,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5499973, y: -0.4575, z: -0.00000047302805}
+  m_ConnectedAnchor: {x: 1.5499973, y: -0.45750004, z: -0.00000047302805}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -12210,7 +12210,7 @@ HingeJoint:
   m_Anchor: {x: -0.7, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.5500004, y: -0.4575, z: -0.00000045090925}
+  m_ConnectedAnchor: {x: 1.5500028, y: -0.45750004, z: 0.000004338235}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -13448,7 +13448,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98f8a5c92c25d3843b0e87a93a04f81b, type: 2}
+  - {fileID: 2100000, guid: bde5eb23413852e489bc94869b826687, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
