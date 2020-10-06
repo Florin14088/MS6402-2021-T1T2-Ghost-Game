@@ -43,7 +43,6 @@ public class F_AI_SimplePain : MonoBehaviour
         agent.angularSpeed = rotSpeed;
         obstacle.enabled = false;
 
-        //target_Tags.Add("Sex");
        // target_Tags.Remove("Faction Zombie");
 
         meleeDamage = Random.Range(meleeDamage - meleeDamage / 2, meleeDamage + meleeDamage * 2);
@@ -69,7 +68,7 @@ public class F_AI_SimplePain : MonoBehaviour
 
     }//Update()
 
-
+    //0 = idle      1 = walk        2 = run         3 = attack
 
     void AI_Brain()
     {
@@ -108,13 +107,13 @@ public class F_AI_SimplePain : MonoBehaviour
         {
             if (agent.pathStatus != NavMeshPathStatus.PathComplete)
             {
-                if (anim.GetInteger("Pain") != 4) anim.SetInteger("Pain", 4);//agony
+                if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
                 if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
             }
 
             if (agent.pathStatus == NavMeshPathStatus.PathComplete)
             {
-                if (anim.GetInteger("Pain") != 1) anim.SetInteger("Pain", 1);//run
+                if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
                 if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
             }
         }
@@ -128,13 +127,13 @@ public class F_AI_SimplePain : MonoBehaviour
         {
             if (agent.pathStatus != NavMeshPathStatus.PathComplete)
             {
-                if (anim.GetInteger("Pain") != 4) anim.SetInteger("Pain", 4);//agony
+                if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
                 if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
             }
 
             if (agent.pathStatus == NavMeshPathStatus.PathComplete)
             {
-                if (anim.GetInteger("Pain") != 1) anim.SetInteger("Pain", 1);//run
+                if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
                 if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
             }
 
@@ -151,7 +150,7 @@ public class F_AI_SimplePain : MonoBehaviour
             Quaternion toRotation = Quaternion.LookRotation(relativePos);
             transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, 5 * Time.deltaTime);
 
-            if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//attack
+            if (anim.GetInteger("Pain") != 3) anim.SetInteger("Pain", 3);//attack
 
             if (Time.time > nextAttkMelee_Cooldown)
             {
@@ -167,10 +166,10 @@ public class F_AI_SimplePain : MonoBehaviour
 
     void AI_Idling()
     {
-        if (obstacle.enabled) obstacle.enabled = false;
-        if (agent.enabled == false) agent.enabled = true;
+        if (agent.enabled) agent.enabled = false;
+        if (obstacle.enabled == false) obstacle.enabled = true;
         if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);
-        if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
+        //if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
 
     }//AI_Idling
 

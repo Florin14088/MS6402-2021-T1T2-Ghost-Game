@@ -813,7 +813,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 400226110805131639}
-  m_Layer: 0
+  m_Layer: 28
   m_Name: RAGDOLL__Girl 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

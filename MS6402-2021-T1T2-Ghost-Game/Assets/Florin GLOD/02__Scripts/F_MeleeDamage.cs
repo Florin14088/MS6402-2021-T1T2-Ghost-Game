@@ -20,13 +20,20 @@ public class F_MeleeDamage : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>() && other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin == false)
+        {
+            other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().aggresor = gameObject.transform.root.transform.gameObject;
+            other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin = true;
+        }
+
+
         if (b_needHelper)
         {
             foreach (string s in helperRadius.GetComponent<F_AI_PassTarget>().enemyTags)
             {
                 if (other.gameObject.transform.root.gameObject.tag == s && other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>())
                 {
-                    Debug.Log("Hit Mechanic from   " + gameObject.name);
+                    //Debug.Log("Hit Mechanic from   " + gameObject.name);
                     containerAvailable_Damage = damage;
                     if (b_ignoreArmor == false)//if damage can be sent to armor first
                     {
@@ -115,7 +122,6 @@ public class F_MeleeDamage : MonoBehaviour
 
         }//damage anything with hp
         
-            
 
     }//OnTriggerEnter
 

@@ -33,9 +33,9 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Ragdoll
+  - Player
+  - NPC
   - IgnoreEachOther
   m_SortingLayers:
   - name: Default
