@@ -82,14 +82,14 @@ public class F_AI_SimplePain : MonoBehaviour
 
         if (currentDistance <= Attack_Distance)
         {
-            if(agent.enabled == true) agent.enabled = false;
-            if(obstacle.enabled == false) obstacle.enabled = true;
+            //if(agent.enabled == true) agent.enabled = false;
+            //if(obstacle.enabled == false) obstacle.enabled = true;
         }
 
         if (currentDistance > Attack_Distance)
         {
-            if (obstacle.enabled == true) obstacle.enabled = false;
-            if (agent.enabled == false) agent.enabled = true;
+            //if (obstacle.enabled == true) obstacle.enabled = false;
+            //if (agent.enabled == false) agent.enabled = true;
         }
         //_______________________________________________________
         #endregion
@@ -123,19 +123,21 @@ public class F_AI_SimplePain : MonoBehaviour
 
         #region Target within pursue distance && Not enough to attack
         //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-        if (currentDistance <= Pursue_Distance && currentDistance > Attack_Distance)
-        {
-            if (agent.pathStatus != NavMeshPathStatus.PathComplete)
-            {
-                if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
-                if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
-            }
+        Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out RaycastHit hit, Attack_Distance);
 
-            if (agent.pathStatus == NavMeshPathStatus.PathComplete)
-            {
-                if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
-                if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
-            }
+        if(hit.collider == null)
+        {
+            if (obstacle.enabled == true) obstacle.enabled = false;
+            if (agent.enabled == false) agent.enabled = true;
+            if (anim.GetInteger("Pain") != 2) anim.SetInteger("Pain", 2);//run
+            if (agent.destination != target.transform.position) agent.SetDestination(target.transform.position);
+        }
+        else
+        {
+            if (obstacle.enabled == true) obstacle.enabled = false;
+            if (agent.enabled == false) agent.enabled = true;
+            if (anim.GetInteger("Pain") != 0) anim.SetInteger("Pain", 0);//idle
+            //if (agent.destination != gameObject.transform.position) agent.SetDestination(gameObject.transform.position);
 
         }
         //___________________________________________________________
