@@ -72,7 +72,7 @@ public class Player_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         __script_HP = gameObject.GetComponent<F_HEALTH>();
-        infoBools.layer_mask_for_CameraRay = LayerMask.GetMask("Ground Walls");
+        infoBools.layer_mask_for_CameraRay = LayerMask.GetMask("Water");
 
     }//Start
 
