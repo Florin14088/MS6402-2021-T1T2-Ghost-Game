@@ -21,7 +21,7 @@ public class F_MeleeDamage : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>() && other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin == false &&
-            other.gameObject.GetComponent<F_AI_Character_Controller>().enabled == true)
+            other.gameObject.GetComponent<F_AI_ControlBoard>().enabled == true)
         {
             other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().aggresor = gameObject.transform.root.transform.gameObject;
             other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin = true;
@@ -65,10 +65,10 @@ public class F_MeleeDamage : MonoBehaviour
                     other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_HP -= containerAvailable_Damage;//all damage available in this variable is sent to health
 
 
-                    if (other.gameObject.transform.root.gameObject.GetComponent<F_AI_SimplePain>().target == null)
+                    if (other.gameObject.transform.root.gameObject.GetComponent<F_AI_ControlBoard>().target == null)
                     {
-                        other.gameObject.transform.root.gameObject.GetComponent<F_AI_SimplePain>().target = gameObject.transform.root.gameObject;
-                        other.gameObject.transform.root.gameObject.GetComponent<F_AI_SimplePain>().target_Tags.Add(gameObject.transform.root.gameObject.tag);
+                        other.gameObject.transform.root.gameObject.GetComponent<F_AI_ControlBoard>().target = gameObject.transform.root.gameObject.transform;
+                        //other.gameObject.transform.root.gameObject.GetComponent<F_AI_ControlBoard>().target_Tags.Add(gameObject.transform.root.gameObject.tag);
                     }
 
                     if(b_infiniteHits == false) gameObject.GetComponent<Collider>().enabled = false;//prevent giving damage multiple time with one hit
@@ -129,43 +129,3 @@ public class F_MeleeDamage : MonoBehaviour
 }//END
 
 
-
-//if (other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>() && other.gameObject.transform.root.gameObject.tag == helperRadius.GetComponent<F_AI_PassTarget>().EnemyTag1
-//    || other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>() && other.gameObject.transform.root.gameObject.tag == helperRadius.GetComponent<F_AI_PassTarget>().EnemyTag2)
-//{
-//    containerAvailable_Damage = damage;
-
-//    if(b_ignoreArmor == false)//if damage can be sent to armor first
-//    {
-//        if (other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM > 0)//if there is armor available
-//        {
-
-//            if(other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM >= containerAvailable_Damage)//can take all damage using armor
-//            {
-//                other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM -= containerAvailable_Damage;//damage sent to armor
-//                containerAvailable_Damage = 0;//damage to be received is zero
-//            }
-
-
-//            if(other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM < containerAvailable_Damage)//not all damage can be received by armor
-//            {
-//                containerPartial_Damage = other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM;//how much armor is available is how much damage is substracted from total
-//                containerAvailable_Damage -= containerPartial_Damage;//how much damage is left to be sent to health
-//                other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_ARM = 0;//all armor used up
-//            }
-
-
-//        }//armor value > 0
-
-
-//    }//ignore armor?
-
-
-//    other.gameObject.transform.root.gameObject.GetComponent<F_HEALTH>().curr_valor_HP -= containerAvailable_Damage;//all damage available in this variable is sent to health
-
-//    gameObject.GetComponent<Collider>().enabled = false;//prevent giving damage multiple time with one hit
-
-
-
-
-//}//got a health script

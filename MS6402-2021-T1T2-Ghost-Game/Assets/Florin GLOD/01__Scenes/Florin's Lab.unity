@@ -2309,13 +2309,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1227466542}
   - component: {fileID: 1227466548}
-  - component: {fileID: 1227466541}
-  - component: {fileID: 1227466540}
   - component: {fileID: 1227466547}
+  - component: {fileID: 1227466540}
+  - component: {fileID: 1227466541}
   - component: {fileID: 1227466546}
   - component: {fileID: 1227466545}
   - component: {fileID: 1227466544}
-  - component: {fileID: 1227466543}
   - component: {fileID: 1227466539}
   - component: {fileID: 1227466537}
   - component: {fileID: 1227466538}
@@ -2430,22 +2429,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!208 &1227466543
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1227466536}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.015, y: 0.5, z: 0.015}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!195 &1227466544
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2520,10 +2503,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 1227466536}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1776c14073e8864e89747e24fb17dae, type: 3}
+  m_Script: {fileID: 11500000, guid: be79f56797dba324c9cb5e5ccf69056b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  target_Tags: []
+  speed: 1
+  rotSpeed: 360
+  b_canRun: 1
+  b_canWander: 1
+  wanderRadius: 10
+  wanderTimer: 3
+  destinationProximity: 1.5
+  Pursue_Distance: 15
+  Attack_Distance: 1.2
+  currentDistance: 0
+  bool_ignoreLimits: 0
+  damageDealers_Melee:
+  - {fileID: 246269664}
+  meleeDamage: 3
+  attackMelee_Cooldown: 2.5
+  nextAttkMelee_Cooldown: 0
 --- !u!114 &1227466548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4100,9 +4100,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2101976204}
-  - component: {fileID: 2101976208}
-  - component: {fileID: 2101976207}
   - component: {fileID: 2101976203}
+  - component: {fileID: 2101976207}
   - component: {fileID: 2101976202}
   - component: {fileID: 2101976201}
   - component: {fileID: 2101976200}
@@ -4110,14 +4109,13 @@ GameObject:
   - component: {fileID: 2101976205}
   - component: {fileID: 2101976198}
   - component: {fileID: 2101976197}
-  - component: {fileID: 2101976206}
   m_Layer: 30
   m_Name: NPC Girl 2
   m_TagString: Finish
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &2101976197
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4236,23 +4234,26 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2101976196}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d7b931bc125b7f44b13070c3df9cb94, type: 3}
+  m_Script: {fileID: 11500000, guid: be79f56797dba324c9cb5e5ccf69056b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   target_Tags: []
-  speed: 3
-  rotSpeed: 360
+  speed: 0
+  rotSpeed: 0
   b_canRun: 1
-  Pursue_Distance: 15
-  Attack_Distance: 1
+  b_canWander: 0
+  wanderRadius: 0
+  wanderTimer: 0
+  destinationProximity: 0
+  Pursue_Distance: 0
+  Attack_Distance: 0
   currentDistance: 0
   bool_ignoreLimits: 0
-  damageDealers_Melee:
-  - {fileID: 270697333}
-  meleeDamage: 2
+  damageDealers_Melee: []
+  meleeDamage: 3
   attackMelee_Cooldown: 2.5
   nextAttkMelee_Cooldown: 0
 --- !u!4 &2101976204
@@ -4291,23 +4292,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &2101976206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2101976196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 636d94ea15ef0c344afad16775f96ee3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_MovingTurnSpeed: 360
-  m_StationaryTurnSpeed: 180
-  m_AnimSpeedMultiplier: 1
-  m_RunCycleLegOffset: 0.2
-  m_GroundCheckDistance: 0.1
 --- !u!114 &2101976207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4325,19 +4309,6 @@ MonoBehaviour:
   m_AnimSpeedMultiplier: 1
   m_RunCycleLegOffset: 0.2
   m_GroundCheckDistance: 0.1
---- !u!114 &2101976208
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2101976196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1776c14073e8864e89747e24fb17dae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 1227466542}
 --- !u!114 &30639119241051596
 MonoBehaviour:
   m_ObjectHideFlags: 0

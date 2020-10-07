@@ -91,6 +91,7 @@ public class F_UserControlBoard : MonoBehaviour
      //_______________________________________________________________________
     #endregion
 
+
     #region My Functions
     //‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
     public void Lifeline_Span()//things like attacking that have long animations will add their duration here to prevent Idle animation taking over until the timer is 0 again

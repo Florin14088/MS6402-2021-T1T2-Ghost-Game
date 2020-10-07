@@ -7,7 +7,7 @@ public class F_Ask_Help_Hurt : MonoBehaviour
     public float inflatePerTurn = 0.01f;
     public float maxDistance = 10;
     public bool b_Begin = false;
-    public GameObject aggresor;
+    public GameObject aggresor;//the script that inflict damage is filling this variable, regardless of what you put now
 
     void Update()
     {
@@ -24,13 +24,13 @@ public class F_Ask_Help_Hurt : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.GetComponent<F_AI_SimplePain>())
+        if (other.gameObject.GetComponent<F_AI_ControlBoard>())
         {
-            if(other.gameObject.GetComponent<F_AI_SimplePain>().target == null)
+            if(other.gameObject.GetComponent<F_AI_ControlBoard>().target == null)
             {
                 if(aggresor != other.gameObject)
                 {
-                    other.gameObject.GetComponent<F_AI_SimplePain>().target = aggresor;
+                    other.gameObject.GetComponent<F_AI_ControlBoard>().target = aggresor.transform;
                 }
             }
         }

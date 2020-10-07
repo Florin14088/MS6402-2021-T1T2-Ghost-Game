@@ -10,7 +10,7 @@ public class F_Possession_Change : MonoBehaviour
     private Rigidbody rb;
     private NavMeshObstacle obstacle;
     private NavMeshAgent agent;
-    private F_AI_Character_Controller __script_AI;
+    private F_AI_ControlBoard __script_AI;
 
     private F_CharacterController __CharCont;
     private F_UserControlBoard __UserCont;
@@ -21,9 +21,9 @@ public class F_Possession_Change : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        obstacle = GetComponent<NavMeshObstacle>();
+       // obstacle = GetComponent<NavMeshObstacle>();
         agent = GetComponent<NavMeshAgent>();
-        __script_AI = GetComponent<F_AI_Character_Controller>();
+        __script_AI = GetComponent<F_AI_ControlBoard>();
         __CharCont = GetComponent<F_CharacterController>();
         __UserCont = GetComponent<F_UserControlBoard>();
 
@@ -38,7 +38,7 @@ public class F_Possession_Change : MonoBehaviour
 
             __script_AI.enabled = true;
             agent.enabled = true;
-            obstacle.enabled = true;
+           // obstacle.enabled = true;
 
             this.enabled = false;
             return;
@@ -50,7 +50,7 @@ public class F_Possession_Change : MonoBehaviour
         {
             __script_AI.enabled = false;
             agent.enabled = false;
-            obstacle.enabled = false;
+            //obstacle.enabled = false;
 
             rb.isKinematic = false;
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
