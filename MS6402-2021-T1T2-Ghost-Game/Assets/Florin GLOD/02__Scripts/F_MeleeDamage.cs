@@ -21,7 +21,7 @@ public class F_MeleeDamage : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>() && other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin == false &&
-            other.gameObject.GetComponent<F_AI_SimplePain>().enabled == true)
+            other.gameObject.GetComponent<F_AI_Character_Controller>().enabled == true)
         {
             other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().aggresor = gameObject.transform.root.transform.gameObject;
             other.gameObject.GetComponentInChildren<F_Ask_Help_Hurt>().b_Begin = true;

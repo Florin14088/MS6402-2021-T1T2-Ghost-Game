@@ -10,7 +10,7 @@ public class F_Possession_Change : MonoBehaviour
     private Rigidbody rb;
     private NavMeshObstacle obstacle;
     private NavMeshAgent agent;
-    private F_AI_SimplePain __script_AI;
+    private F_AI_Character_Controller __script_AI;
 
     private F_CharacterController __CharCont;
     private F_UserControlBoard __UserCont;
@@ -23,7 +23,7 @@ public class F_Possession_Change : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         obstacle = GetComponent<NavMeshObstacle>();
         agent = GetComponent<NavMeshAgent>();
-        __script_AI = GetComponent<F_AI_SimplePain>();
+        __script_AI = GetComponent<F_AI_Character_Controller>();
         __CharCont = GetComponent<F_CharacterController>();
         __UserCont = GetComponent<F_UserControlBoard>();
 

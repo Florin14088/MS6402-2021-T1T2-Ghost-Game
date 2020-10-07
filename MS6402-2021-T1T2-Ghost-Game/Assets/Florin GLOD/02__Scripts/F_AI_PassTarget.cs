@@ -10,8 +10,9 @@ public class F_AI_PassTarget : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
+        if (gameObject.GetComponentInParent<F_AI_Character_Controller>().enabled == false) return;
+
         enemyTags = GetComponentInParent<F_AI_SimplePain>().target_Tags;
-       // GetComponentInParent<F_AI_SimplePain>().target = null;
 
         foreach (string s in enemyTags)
         {
